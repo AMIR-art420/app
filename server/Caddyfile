@@ -1,0 +1,4 @@
+# YOURDOMAIN.com را با دامنه‌ی خودت عوض کن؛ Caddy خودش گواهی HTTPS می‌گیرد و WebSocket را هم رد می‌کند
+YOURDOMAIN.com {
+    reverse_proxy localhost:3000
+}

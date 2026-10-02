@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2f7de1">
+<title>پیام‌رسان</title>
+<style>
+:root{--bg:#f2f6fc;--card:#fff;--ink:#223344;--mute:#6b7c8f;--brand:#2f7de1;--mine:#2f7de1;--mine-ink:#fff;--other:#fff;--line:#dde5ef;--err:#c0392b}
+:root[data-theme="black"]{--bg:#08090b;--card:#121418;--ink:#f0f2f5;--mute:#9aa3ad;--brand:#111;--mine:#2a2d33;--mine-ink:#fff;--other:#171a1f;--line:#292e35}
+:root[data-theme="red"]{--bg:#fff3f3;--card:#fff;--ink:#351b1b;--mute:#866666;--brand:#d93636;--mine:#d93636;--mine-ink:#fff;--other:#fff;--line:#f0caca}
+:root[data-theme="green"]{--bg:#f0faf3;--card:#fff;--ink:#173522;--mute:#668070;--brand:#249653;--mine:#249653;--mine-ink:#fff;--other:#fff;--line:#cfe8d8}
+:root[data-theme="purple"]{--bg:#f7f1ff;--card:#fff;--ink:#2b1d3b;--mute:#786b8b;--brand:#7b45c7;--mine:#7b45c7;--mine-ink:#fff;--other:#fff;--line:#e0d4ef}
+
+@media(prefers-color-scheme:dark){:root{--bg:#10161d;--card:#18212b;--ink:#e6edf5;--mute:#8fa0b3;--other:#202b37;--line:#27333f;--err:#ff7b6b}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:Vazirmatn,Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.view{display:none;height:100dvh;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.view.on{display:flex}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--brand);color:#fff}
+header h1{font-size:18px;margin:0;flex:1}
+header small{opacity:.85}
+.back{background:none;border:0;color:#fff;font-size:22px;padding:0 4px}.iconbtn{background:none;border:0;color:#fff;font-size:20px;padding:2px 6px}
+.pad{padding:14px 16px;overflow-y:auto;flex:1}
+.field{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-bottom:10px}
+.btn{padding:11px 18px;border:0;border-radius:12px;background:var(--brand);color:#fff;font-weight:600}
+.btn.ghost{background:none;color:var(--brand);border:1px solid var(--brand)}
+.row{display:flex;gap:8px;align-items:center}
+.room{display:flex;align-items:stretch;width:100%;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.room .main{flex:1;display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:start;padding:13px 14px;background:none;border:0;min-width:0}
+.room .main div{overflow-wrap:anywhere}
+.room span{color:var(--mute);font-size:13px;white-space:nowrap}
+.room .badge{background:var(--brand);color:#fff;border-radius:10px;padding:0 8px;font-size:12px;min-width:20px;text-align:center}
+.room .act{background:none;border:0;border-inline-start:1px solid var(--line);color:var(--err);padding:0 14px;font-size:13px}
+.toast{position:fixed;top:calc(8px + env(safe-area-inset-top));left:10px;right:10px;z-index:20;background:var(--card);color:var(--ink);border:1px solid var(--line);border-inline-start:4px solid var(--brand);border-radius:12px;padding:10px 14px;box-shadow:0 6px 24px #0003;display:none;cursor:pointer;overflow-wrap:anywhere}
+.toast.on{display:block}
+.toast b{display:block;font-size:13px;color:var(--brand)}
+.sec{font-size:13px;color:var(--mute);margin:14px 2px 6px}
+.empty{text-align:center;color:var(--mute);padding:28px 8px}
+#msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px}
+.mwrap{display:flex;gap:7px;align-items:flex-end;max-width:92%;align-self:flex-start}.mwrap.me{align-self:flex-end;flex-direction:row-reverse}.avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:var(--brand);flex:0 0 34px}.avatar.fallback{display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}.m{max-width:82%;padding:8px 12px;border-radius:16px;background:var(--other);border:1px solid var(--line);overflow-wrap:anywhere}
+.m.me{align-self:flex-end;background:var(--mine);color:var(--mine-ink);border-color:var(--mine)}
+.m b{display:block;font-size:12px;color:var(--brand)}
+.m.me b{display:none}
+.m i{display:block;font-size:11px;opacity:.65;font-style:normal;text-align:end}
+.m p{margin:0;white-space:pre-wrap}
+#bar{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--card);border-top:1px solid var(--line)}
+#bar input{flex:1;margin:0}
+.sheet{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;z-index:9}
+.sheet.on{display:flex}
+.sheet>div{width:100%;background:var(--card);padding:18px 16px calc(18px + env(safe-area-inset-bottom));border-radius:20px 20px 0 0}
+.sheet h2{margin:0 0 12px;font-size:17px}
+.err{color:var(--err);min-height:22px;font-size:14px;margin:0 0 8px}
+@media(prefers-reduced-motion:no-preference){.sheet.on>div{animation:up .18s ease-out}@keyframes up{from{transform:translateY(30px);opacity:0}}}
+
+.authCard{max-width:430px;width:100%;margin:auto;padding:24px 18px}.authLogo{font-size:28px;font-weight:800;text-align:center;margin-bottom:6px}.authSub{text-align:center;color:var(--mute);margin-bottom:20px}.profilePick{display:flex;flex-direction:column;align-items:center;gap:8px;margin:8px 0 16px}.profilePreview{width:92px;height:92px;border-radius:50%;object-fit:cover;background:var(--brand);display:block}.profileFallback{width:92px;height:92px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px}.themeGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.themeBtn{height:44px;border-radius:12px;border:2px solid var(--line)}.themeBtn[data-t="blue"]{background:#2f7de1}.themeBtn[data-t="black"]{background:#111}.themeBtn[data-t="red"]{background:#d93636}.themeBtn[data-t="green"]{background:#249653}.themeBtn[data-t="purple"]{background:#7b45c7}.settingsSection{margin-bottom:20px}.settingsSection h3{font-size:14px;color:var(--mute);margin:0 0 8px}.profileLine{display:flex;align-items:center;gap:10px;padding:10px 0}.profileLine img{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--brand)}</style>
+</head>
+<body>
+
+<div class="toast" id="toast" role="status"></div>
+
+<section class="view on" id="auth">
+  <div class="authCard">
+    <div class="authLogo">پیام‌رسان</div><div class="authSub">برای ادامه وارد حساب خود شوید یا ثبت‌نام کنید.</div>
+    <div class="profilePick" id="profilePick"><div class="profileFallback" id="profileFallback">👤</div><img id="profilePreview" class="profilePreview" style="display:none"><button class="btn ghost" id="profileBtn">انتخاب عکس پروفایل</button><input id="profileFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></div>
+    <input class="field" id="username" maxlength="24" placeholder="نام کاربری" autocomplete="username">
+    <input class="field" id="password" type="password" maxlength="72" placeholder="رمز عبور (حداقل ۶ کاراکتر)" autocomplete="new-password">
+    <p class="err" id="authErr"></p>
+    <div class="row"><button class="btn" id="registerBtn" style="flex:1">ثبت‌نام</button><button class="btn ghost" id="loginBtn" style="flex:1">ورود</button></div>
+  </div>
+</section>
+
+<section class="view" id="home">
+  <header><h1>پیام‌رسان</h1><button class="iconbtn" id="settingsBtn" aria-label="تنظیمات">⚙</button></header>
+  <div class="pad">
+    <div class="row">
+      <input class="field" id="q" type="search" placeholder="جستجوی اتاق (فارسی یا English)" autocomplete="off" style="margin:0">
+      <button class="btn" id="newBtn">اتاق جدید</button>
+    </div>
+    <div id="mine"></div>
+    <div class="sec" id="listTitle">اتاق‌ها</div>
+    <div id="list"></div>
+  </div>
+</section>
+
+<section class="view" id="settings">
+  <header><button class="back" id="settingsBack">›</button><h1>تنظیمات</h1></header>
+  <div class="pad">
+    <div class="settingsSection"><h3>حساب کاربری</h3><div class="profileLine"><img id="settingsAvatar" src="" alt=""><div><b id="settingsUsername"></b><div style="color:var(--mute);font-size:13px">پروفایل شما</div></div></div><button class="btn ghost" id="changeProfileBtn">تغییر عکس پروفایل</button><input id="settingsProfileFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></div>
+    <div class="settingsSection"><h3>تم</h3><div class="themeGrid"><button class="themeBtn" data-t="blue" title="آبی"></button><button class="themeBtn" data-t="black" title="مشکی"></button><button class="themeBtn" data-t="red" title="قرمز"></button><button class="themeBtn" data-t="green" title="سبز"></button><button class="themeBtn" data-t="purple" title="بنفش"></button></div></div>
+    <div class="settingsSection"><button class="btn ghost" id="logoutBtn">خروج از حساب</button></div>
+  </div>
+</section>
+
+<section class="view" id="chat">
+  <header><button class="back" id="back" aria-label="بازگشت">›</button><h1 id="rname"></h1><small id="onl"></small></header>
+  <div id="msgs"></div>
+  <div id="bar"><input class="field" id="text" maxlength="1000" placeholder="پیام..." autocomplete="off"><button class="btn" id="sendBtn">ارسال</button></div>
+</section>
+
+<div class="sheet" id="joinSheet"><div>
+  <h2 id="joinTitle"></h2>
+  <input class="field" id="jpw" type="password" placeholder="رمز اتاق" autocomplete="off">
+  <p class="err" id="jerr"></p>
+  <div class="row"><button class="btn" id="joinGo">ورود</button><button class="btn ghost" data-close>انصراف</button></div>
+</div></div>
+
+<div class="sheet" id="newSheet"><div>
+  <h2>ساخت اتاق جدید</h2>
+  <input class="field" id="nname" maxlength="40" placeholder="نام اتاق" autocomplete="off">
+  <input class="field" id="npw" type="password" placeholder="رمز اتاق (حداقل ۶ حرف)" autocomplete="off">
+  <p class="err" id="nerr"></p>
+  <div class="row"><button class="btn" id="newGo">ساخت اتاق</button><button class="btn ghost" data-close>انصراف</button></div>
+</div></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const ls = { get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const fa = n => Number(n).toLocaleString('fa-IR');
+
+// شناسه‌ی این دستگاه (برای شمردن اتاق‌هایی که ساخته‌اید)
+const cid = (() => {
+  let c = ls.get('cid', '');
+  if (!/^[A-Za-z0-9_-]{16,64}$/.test(c)) { c = Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2, '0')).join(''); ls.set('cid', c); }
+  return c;
+})();
+const H = () => ({ 'X-Client-Id': cid });
+
+let ws = null, queue = [], retry = 0, cur = null, joining = null, pending = null, unread = {}; let user = ls.get('user', null); let authTokenValue = ls.get('authToken', ''); let selectedProfile = '';
+let members = ls.get('rooms', {});   // اتاق‌های عضو: {id:{name, token}}  (نسخه‌های قدیمی ممکن است pw داشته باشند)
+let created = ls.get('created', []); // اتاق‌هایی که خودم ساخته‌ام: [{id,name}]
+let maxOwn = 5;
+const nickVal = () => user?.username || '';
+const authHeaders = () => ({ 'Content-Type':'application/json', 'Authorization':'Bearer '+authTokenValue });
+function setTheme(t){ const x=['blue','black','red','green','purple'].includes(t)?t:'blue'; document.documentElement.dataset.theme=x; ls.set('theme',x); }
+setTheme(ls.get('theme','blue'));
+function setUser(d){ user=d.user; authTokenValue=d.token; ls.set('user',user); ls.set('authToken',authTokenValue); }
+
+const show = id => document.querySelectorAll('.view').forEach(v => v.classList.toggle('on', v.id === id));
+const sheet = (id, on) => $('#' + id).classList.toggle('on', on);
+document.querySelectorAll('[data-close]').forEach(b => b.onclick = () => document.querySelectorAll('.sheet').forEach(s => s.classList.remove('on')));
+const saveMembers = () => ls.set('rooms', members);
+
+
+function showProfile(img, fallback, data, username){
+  if(data){ img.src=data; img.style.display='block'; fallback.style.display='none'; }
+  else { img.style.display='none'; fallback.style.display='flex'; fallback.textContent=(username||'؟').slice(0,1).toUpperCase(); }
+}
+function readProfile(file, cb){
+  if(!file) return;
+  if(file.size>500*1024){ $('#authErr').textContent='عکس پروفایل باید کمتر از ۵۰۰ کیلوبایت باشد.'; return; }
+  const fr=new FileReader(); fr.onload=()=>cb(fr.result); fr.readAsDataURL(file);
+}
+$('#profileBtn').onclick=()=>$('#profileFile').click();
+$('#profileFile').onchange=()=>readProfile($('#profileFile').files[0], data=>{selectedProfile=data; showProfile($('#profilePreview'),$('#profileFallback'),data,$('#username').value);});
+async function authRequest(path, body){
+  $('#authErr').textContent='';
+  try{
+    const r=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.error||'خطا');
+    setUser(d); $('#password').value=''; show('home'); syncMine(); search(); wsOpen();
+  }catch(e){ $('#authErr').textContent=e.message; }
+}
+$('#registerBtn').onclick=()=>authRequest('/api/auth/register',{username:$('#username').value.trim(),password:$('#password').value,profile:selectedProfile});
+$('#loginBtn').onclick=()=>authRequest('/api/auth/login',{username:$('#username').value.trim(),password:$('#password').value});
+$('#password').onkeydown=e=>{if(e.key==='Enter') $('#loginBtn').click();};
+$('#settingsBtn').onclick=()=>{ $('#settingsUsername').textContent=user?.username||''; $('#settingsAvatar').src=user?.profile||''; $('#settingsAvatar').style.display='block'; show('settings'); };
+$('#settingsBack').onclick=()=>show('home');
+$('#changeProfileBtn').onclick=()=>$('#settingsProfileFile').click();
+$('#settingsProfileFile').onchange=async()=>{
+  const f=$('#settingsProfileFile').files[0]; if(!f)return;
+  readProfile(f,async data=>{
+    try{ const r=await fetch('/api/auth/profile',{method:'PUT',headers:authHeaders(),body:JSON.stringify({profile:data})}); const d=await r.json(); if(!r.ok)throw new Error(d.error||'خطا'); setUser(d); $('#settingsUsername').textContent=user.username; $('#settingsAvatar').src=user.profile||''; if(ws){ws.close();ws=null;setTimeout(wsOpen,50);} }
+    catch(e){alert(e.message);}
+  });
+};
+document.querySelectorAll('.themeBtn').forEach(b=>b.onclick=()=>setTheme(b.dataset.t));
+$('#logoutBtn').onclick=()=>{ if(!confirm('از حساب خارج می‌شوید؟'))return; user=null;authTokenValue='';ls.set('user',null);ls.set('authToken','');if(ws){ws.close();ws=null;}show('auth'); };
+if(user&&authTokenValue){show('home');}else show('auth');
+
+// ---- فهرست‌ها ----
+function roomRow(r, extra, action) {
+  const row = document.createElement('div'); row.className = 'room';
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'main';
+  const n = document.createElement('div'); n.textContent = r.name; n.dir = 'auto';
+  const side = document.createElement('div'); side.style.cssText = 'display:flex;gap:8px;align-items:center';
+  if (extra) { const s = document.createElement('span'); s.textContent = extra; side.append(s); }
+  if (unread[r.id]) { const u = document.createElement('span'); u.className = 'badge'; u.textContent = fa(unread[r.id]); side.append(u); }
+  b.append(n, side); b.onclick = () => enter(r.id, r.name); row.append(b);
+  if (action) { const x = document.createElement('button'); x.type = 'button'; x.className = 'act'; x.textContent = action.label; x.onclick = action.fn; row.append(x); }
+  return row;
+}
+async function search() {
+  const q = $('#q').value.trim();
+  $('#listTitle').textContent = q ? 'نتیجه‌ی جستجو' : 'همه‌ی اتاق‌ها';
+  try {
+    const rows = await (await fetch('/api/rooms?q=' + encodeURIComponent(q))).json();
+    const box = $('#list'); box.replaceChildren();
+    if (!rows.length) { const e = document.createElement('div'); e.className = 'empty'; e.textContent = q ? 'اتاقی با این نام پیدا نشد. می‌توانید خودتان بسازید.' : 'هنوز اتاقی ساخته نشده. اولین اتاق را بسازید.'; box.append(e); }
+    rows.forEach(r => box.append(roomRow(r, [r.online ? r.online + ' آنلاین' : '', members[r.id] ? 'عضو' : ''].filter(Boolean).join(' · '))));
+  } catch { $('#list').textContent = 'اتصال به سرور برقرار نشد.'; }
+}
+function section(box, title, rooms, emptyText, action) {
+  const t = document.createElement('div'); t.className = 'sec'; t.textContent = title; box.append(t);
+  if (!rooms.length) { const e = document.createElement('div'); e.className = 'empty'; e.style.padding = '10px 8px'; e.textContent = emptyText; box.append(e); }
+  rooms.forEach(r => box.append(roomRow(r, '', action(r))));
+}
+function renderMine() {
+  const box = $('#mine'); box.replaceChildren();
+  const mineIds = new Set(created.map(r => String(r.id)));
+  const joined = Object.keys(members).filter(id => !mineIds.has(id)).map(id => ({ id, name: members[id].name }));
+  section(box, 'اتاق‌هایی که عضو هستم', joined, 'هنوز عضو اتاقی نیستید. وارد یک اتاق شوید و رمزش را بزنید تا اینجا بیاید.', r => ({ label: 'خروج', fn: () => leaveMember(r) }));
+  section(box, `اتاق‌هایی که ساخته‌ام (${fa(created.length)} از ${fa(maxOwn)})`, created, 'هنوز اتاقی نساخته‌اید.', r => ({ label: 'حذف', fn: () => delRoom(r) }));
+}
+async function syncMine() {
+  try { const d = await (await fetch('/api/mine', { headers: H() })).json(); created = d.rooms; maxOwn = d.max; ls.set('created', created); renderMine(); } catch {}
+}
+let tm; $('#q').oninput = () => { clearTimeout(tm); tm = setTimeout(search, 250); };
+
+function forget(id) {
+  delete members[id]; delete unread[id]; saveMembers();
+  created = created.filter(r => String(r.id) !== String(id)); ls.set('created', created);
+  wsSend({ t: 'unsub', id: +id });
+}
+function leaveMember(r) {
+  if (!confirm(`از عضویت «${r.name}» خارج می‌شوید؟\nدیگر از این اتاق اعلان نمی‌گیرید و برای ورود دوباره باید رمز را بزنید.`)) return;
+  forget(r.id); renderMine(); search();
+}
+async function delRoom(r) {
+  if (!confirm(`اتاق «${r.name}» با همه‌ی پیام‌هایش برای همیشه حذف شود؟`)) return;
+  try {
+    const x = await fetch('/api/rooms/' + r.id, { method: 'DELETE', headers: H() });
+    if (!x.ok && x.status !== 404) throw 0;
+  } catch { alert('حذف انجام نشد. اتصال را بررسی کنید.'); return; }
+  forget(r.id); renderMine(); search(); syncMine();
+}
+
+// ---- اتصال (یک WebSocket برای همه‌ی اتاق‌های عضو) ----
+function wsSend(o) { if (ws && ws.readyState === 1) ws.send(JSON.stringify(o)); else { queue.push(o); wsOpen(); } }
+const cred = id => { const m = members[id] || {}; return m.token ? { token: m.token } : m.pw ? { password: m.pw } : {}; };
+function wsOpen() {
+  if (ws && ws.readyState < 2) return;
+  const s = ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+  const tx = o => s.send(JSON.stringify(o));
+  s.onopen = () => {
+    retry = 0;
+    if (!authTokenValue) return;
+    tx({ t: 'auth', token: authTokenValue });
+    tx({ t: 'sub', nick: nickVal(), items: Object.keys(members).map(id => ({ id: +id, ...cred(id) })) });
+    if (cur) tx({ t: 'join', id: cur.id, nick: nickVal(), ...cred(cur.id) });
+    queue.splice(0).forEach(tx);
+  };
+  s.onmessage = ev => { let d; try { d = JSON.parse(ev.data); } catch { return; } onWs(d); };
+  s.onclose = () => {
+    if (ws !== s) return; ws = null;
+    if (cur) $('#onl').textContent = 'در حال اتصال...';
+    setTimeout(wsOpen, Math.min(1000 * ++retry, 8000));
+  };
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) wsOpen(); });
+
+function onWs(d) {
+  if (d.t === 'autherr') { authTokenValue=''; user=null; ls.set('authToken',''); ls.set('user',null); show('auth'); return; }
+  if (d.t === 'authed') { user=d.user; ls.set('user',user); return; }
+  if (d.t === 'err') {
+    if (joining) {
+      $('#jerr').textContent = d.m;
+      if (!$('#joinSheet').classList.contains('on')) { pending = joining; $('#joinTitle').textContent = joining.name; $('#jpw').value = ''; sheet('joinSheet', true); }
+    } else if (cur) leaveChat();
+  } else if (d.t === 'subbed') {
+    d.ok.forEach(r => { members[r.id] = { name: r.name, token: r.token }; });
+    d.bad.forEach(b => { if (b.why !== 'limit') { delete members[b.id]; if (cur && cur.id === b.id) leaveChat(); } });
+    saveMembers(); renderMine();
+  } else if (d.t === 'joined') {
+    retry = 0; joining = null; cur = { id: d.id, name: d.name };
+    members[d.id] = { name: d.name, token: d.token }; saveMembers(); delete unread[d.id];
+    $('#rname').textContent = d.name; $('#msgs').replaceChildren(); d.history.forEach(addMsg);
+    sheet('joinSheet', false); show('chat');
+  } else if (d.t === 'msg') onMsg(d);
+  else if (d.t === 'online') { if (cur && d.room === cur.id) $('#onl').textContent = d.n + ' آنلاین'; }
+  else if (d.t === 'gone') { const wasCur = cur && cur.id === d.room; forget(d.room); if (wasCur) leaveChat(); renderMine(); search(); }
+}
+
+// ---- ورود به اتاق ----
+function enter(id, name) {
+  pending = { id, name };
+  if (members[id] && (members[id].token || members[id].pw)) {   // عضو هستم: بدون پرسیدن رمز
+    if (!nickVal()) { $('#nick').focus(); return; }
+    joining = pending; wsSend({ t: 'join', id: +id, nick: nickVal(), ...cred(id) }); return;
+  }
+  $('#joinTitle').textContent = name; $('#jerr').textContent = ''; $('#jpw').value = ''; sheet('joinSheet', true); $('#jpw').focus();
+}
+$('#joinGo').onclick = () => {
+  const pw = $('#jpw').value; if (!pw || !pending) return;
+  if (!nickVal()) { $('#jerr').textContent = 'اول نام نمایشی خود را بنویسید.'; return; }
+  $('#jerr').textContent = ''; askNotify();
+  joining = pending; wsSend({ t: 'join', id: +pending.id, password: pw, nick: nickVal() });
+};
+$('#jpw').onkeydown = e => e.key === 'Enter' && $('#joinGo').click();
+function leaveChat() { cur = null; joining = null; wsSend({ t: 'leave' }); show('home'); renderMine(); search(); }
+$('#back').onclick = leaveChat;
+
+// ---- پیام‌ها ----
+function addMsg(m) {
+  const box = $('#msgs'), near = box.scrollHeight - box.scrollTop - box.clientHeight < 120;
+  const mine = m.user_id && user && String(m.user_id) === String(user.id);
+  const wrap = document.createElement('div'); wrap.className = 'mwrap' + (mine ? ' me' : '');
+  const av = document.createElement('div'); av.className='avatar';
+  if(m.profile){ const im=document.createElement('img'); im.className='avatar'; im.src=m.profile; av.replaceWith(im); }
+  else av.textContent=(m.nick||'?').slice(0,1);
+  const el = document.createElement('div'); el.className = 'm';
+  if(mine) el.classList.add('me');
+  const b = document.createElement('b'); b.textContent = m.nick;
+  const p = document.createElement('p'); p.textContent = m.text; p.dir = 'auto';
+  const t = document.createElement('i'); t.textContent = new Date(m.ts).toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+  el.append(b, p, t); wrap.append(av,el); box.append(wrap); if (near) box.scrollTop = box.scrollHeight;
+}
+function sendMsg() {
+  const v = $('#text').value.trim(); if (!v || !ws || ws.readyState !== 1) return;
+  ws.send(JSON.stringify({ t: 'msg', text: v })); $('#text').value = ''; $('#text').focus();
+}
+$('#sendBtn').onclick = sendMsg; $('#text').onkeydown = e => e.key === 'Enter' && sendMsg();
+
+// ---- اعلان‌ها (فقط برای اتاق‌هایی که عضو هستم) ----
+const LN = () => window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications;
+let notifId = 0, toastTm;
+async function askNotify() {
+  try {
+    const ln = LN();
+    if (ln) { const p = await ln.checkPermissions(); if (p.display !== 'granted' && p.display !== 'denied') await ln.requestPermissions(); }
+    else if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+  } catch {}
+}
+(async () => {
+  const ln = LN(); if (!ln) return;
+  try {
+    await ln.createChannel({ id: 'messages', name: 'پیام‌ها', importance: 4, visibility: 1, vibration: true });
+    ln.addListener('localNotificationActionPerformed', e => {
+      const id = e && e.notification && e.notification.extra && e.notification.extra.room;
+      if (id && members[id]) enter(id, members[id].name);
+    });
+  } catch {}
+})();
+async function notify(d) {
+  const title = (members[d.room] || {}).name || 'پیام جدید', body = `${d.nick}: ${d.text}`.slice(0, 140), ln = LN();
+  if (ln) { try { await ln.schedule({ notifications: [{ id: (notifId = notifId % 2e9 + 1), title, body, channelId: 'messages', extra: { room: d.room } }] }); return; } catch {} }
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try { const n = new Notification(title, { body, tag: 'room-' + d.room }); n.onclick = () => { window.focus(); enter(d.room, title); n.close(); }; } catch {}
+  }
+}
+function toast(d) {
+  const el = $('#toast'), name = (members[d.room] || {}).name || '';
+  el.replaceChildren(); const b = document.createElement('b'); b.textContent = name; b.dir = 'auto';
+  const p = document.createElement('div'); p.textContent = `${d.nick}: ${d.text}`.slice(0, 120); p.dir = 'auto';
+  el.append(b, p); el.onclick = () => { el.classList.remove('on'); enter(d.room, name); };
+  el.classList.add('on'); clearTimeout(toastTm); toastTm = setTimeout(() => el.classList.remove('on'), 4500);
+}
+function onMsg(d) {
+  if (!members[d.room]) return;                       // اتاقی که عضوش نیستم: هیچ اعلانی نه
+  const inRoom = cur && d.room === cur.id;
+  if (inRoom) addMsg(d);
+  if (d.user_id && user && String(d.user_id) === String(user.id)) return; // پیام خودم
+  if (inRoom && !document.hidden) return;             // دارم همین اتاق را می‌بینم
+  if (!inRoom) { unread[d.room] = (unread[d.room] || 0) + 1; renderMine(); }
+  if (document.hidden) notify(d); else toast(d);
+}
+
+// ---- ساخت اتاق ----
+const limitMsg = () => `هر نفر حداکثر ${fa(maxOwn)} اتاق می‌تواند بسازد. برای ساخت اتاق جدید، یکی از اتاق‌های خودتان را حذف کنید.`;
+$('#newBtn').onclick = () => {
+  $('#nname').value = $('#q').value.trim(); $('#npw').value = '';
+  $('#nerr').textContent = created.length >= maxOwn ? limitMsg() : ''; sheet('newSheet', true);
+};
+$('#newGo').onclick = async () => {
+  if (!nickVal()) { $('#nerr').textContent = 'اول نام نمایشی خود را بنویسید.'; return; }
+  if (created.length >= maxOwn) { $('#nerr').textContent = limitMsg(); return; }
+  const name = $('#nname').value.trim(), password = $('#npw').value;
+  askNotify();
+  let r, d;
+  try {
+    r = await fetch('/api/rooms', { method: 'POST', headers: { 'Content-Type': 'application/json', ...H() }, body: JSON.stringify({ name, password }) });
+    d = await r.json();
+  } catch { $('#nerr').textContent = 'اتصال به سرور برقرار نشد.'; return; }
+  if (!r.ok) { $('#nerr').textContent = d.error; return; }
+  created.push({ id: d.id, name: d.name }); ls.set('created', created);
+  sheet('newSheet', false); joining = { id: d.id, name: d.name };
+  wsSend({ t: 'join', id: d.id, password, nick: nickVal() });
+  syncMine();
+};
+
+renderMine(); search(); syncMine();
+if (Object.keys(members).length) wsOpen();
+</script>
+</body>
+</html>

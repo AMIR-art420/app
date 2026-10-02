@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: payamresan
+    runtime: node
+    plan: free
+    rootDir: server
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: KEEP_DAYS
+        value: "30"

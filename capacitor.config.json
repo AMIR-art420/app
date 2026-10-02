@@ -1,0 +1,13 @@
+{
+  "appId": "com.migmig.payamresan",
+  "appName": "پیام‌رسان",
+  "webDir": "www",
+  "server": {
+    "url": "https://payamresan.onrender.com",
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
